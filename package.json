@@ -14,14 +14,15 @@
   "author": "Moksh Jain",
   "license": "MIT",
   "dependencies": {
-    "body-parser": "*",
     "bcryptjs": "*",
+    "body-parser": "*",
     "cors": "*",
-    "jsonwebtoken": "",
-    "passport":"*",
-    "passport-jwt": "*",
     "express": "*",
+    "express-ws": "^3.0.0",
+    "jsonwebtoken": "",
     "mongoose": "*",
+    "passport": "*",
+    "passport-jwt": "*",
     "ws": "*"
   }
 }

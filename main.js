@@ -8,6 +8,7 @@ const passport = require('passport');
 const mongoose = require('mongoose');
 
 const app = express();
+const expressWs = require('express-ws')(app);
 
 const users = require('./routes/users');
 const config = require('./config/db');
@@ -21,8 +22,8 @@ mongoose.connection.on('error', (err) => {
   console.log('Error connecting to database :'+ err);
 });
 
-const server = http.createServer(app);
-const wss = new WebSocket.Server({clientTracking: true ,server});
+// const server = http.createServer(app);
+// const wss = new WebSocket.Server({clientTracking: true ,server});
 
 app.set('port', process.env.PORT || 3000);
 
@@ -40,6 +41,6 @@ app.get('/', (req, resp) => {
   resp.send("Invalid Route");
 });
 
-server.listen(app.get('port'), () => {
+app.listen(app.get('port'), () => {
   console.log("Server started on port: " + app.get('port'));
 });

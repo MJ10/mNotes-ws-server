@@ -58,4 +58,10 @@ router.get('/profile', passport.authenticate('jwt', {session: false}), (req, res
   res.json({ user: req.user});
 });
 
+router.ws('/ws', (ws, req)=> {
+  ws.on('message', (msg)=>{
+    ws.send(msg);
+  })
+});
+
 module.exports = router;
