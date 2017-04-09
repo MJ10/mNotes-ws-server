@@ -59,8 +59,27 @@ router.get('/profile', passport.authenticate('jwt', {session: false}), (req, res
 });
 
 router.ws('/ws', (ws, req)=> {
-  ws.on('message', (msg)=>{
-    ws.send(msg);
+  console.log("Connected!");
+  ws.on('message', (msg) => {
+    console.log(msg)
+    newMsg = JSON.parse(msg);
+    console.log(newMsg.method);
+    switch (newMsg.method) {
+      case "getUser":
+      console.log("getUserMethod " + newMsg.params[0].username);
+        User.getUserByUsername(newMsg.params[0].username, (err, user) => {
+          if(err) throw err;
+          ws.send(JSON.stringify({user: {
+            name:user.name,
+            id: user.id,
+            username: user.name,
+            email: user.email
+          }}));
+        })
+        break;
+      default:
+
+    }
   })
 });
 
