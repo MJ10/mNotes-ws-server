@@ -66,16 +66,50 @@ router.ws('/ws', (ws, req)=> {
     console.log(newMsg.method);
     switch (newMsg.method) {
       case "getUser":
-      console.log("getUserMethod " + newMsg.params[0].username);
-        User.getUserByUsername(newMsg.params[0].username, (err, user) => {
-          if(err) throw err;
-          ws.send(JSON.stringify({user: {
-            name:user.name,
-            id: user.id,
-            username: user.name,
-            email: user.email
-          }}));
-        })
+        console.log("getUserMethod " + newMsg.params[0].token);
+        jwt.verify(newMsg.params[0].token, config.secret, (err, user) => {
+          if(err) {
+            ws.send(JSON.stringify(
+              {
+                method: "getUser",
+                params: [
+                  {
+                    error: {
+                      name: err.name,
+                      msg: err.message
+                    }
+                  }
+                ]
+              }
+            ));
+          } else {
+            ws.send(JSON.stringify(
+              {
+                method: "getUser",
+                params: [
+                  {
+                    result: {
+                      name:user._doc.name,
+                      id: user.id,
+                      username: user.name,
+                      email: user.email1
+
+                    }
+                  }
+                ]
+              }
+            ));
+          }
+        });
+        // User.getUserByUsername(newMsg.params[0].username, (err, user) => {
+        //   if(err) throw err;
+        //   ws.send(JSON.stringify({user: {
+        //     name:user.name,
+        //     id: user.id,
+        //     username: user.name,
+        //     email: user.email
+        //   }}));
+        // })
         break;
       default:
 
