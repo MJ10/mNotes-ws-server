@@ -18,10 +18,7 @@ const UserSchema  = mongoose.Schema({
     type: String,
     required: true
   },
-  notes: {
-    type: Array(),
-    required: true
-  }
+  notes: []
 });
 
 const User = module.exports = mongoose.model('User', UserSchema);

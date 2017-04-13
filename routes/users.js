@@ -10,11 +10,12 @@ router.post('/register', (req, res, next) => {
     name: req.body.name,
     email: req.body.email,
     username: req.body.username,
-    password: req.body.password
+    password: req.body.password,
+    notes: []
   });
   User.addUser(newUser, (err, user) => {
     if(err){
-      res.json({success: false, message: "failed to register user"});
+      res.json({success: false, message: err});
     } else {
       res.json({success: true, message: "user registered"});
     }
@@ -61,17 +62,14 @@ router.get('/profile', passport.authenticate('jwt', {session: false}), (req, res
 router.ws('/ws', (ws, req)=> {
   console.log("Connected!");
   ws.on('message', (msg) => {
-    console.log(msg)
-    newMsg = JSON.parse(msg);
-    console.log(newMsg.method);
-    switch (newMsg.method) {
+    msg = JSON.parse(msg);
+    switch (msg.method) {
       case "getUser":
-        console.log("getUserMethod " + newMsg.params[0].token);
-        jwt.verify(newMsg.params[0].token, config.secret, (err, user) => {
+        jwt.verify(msg.params[0].token, config.secret, (err, payload) => {
           if(err) {
             ws.send(JSON.stringify(
               {
-                method: "getUser",
+                method: msg.method,
                 params: [
                   {
                     error: {
@@ -85,15 +83,14 @@ router.ws('/ws', (ws, req)=> {
           } else {
             ws.send(JSON.stringify(
               {
-                method: "getUser",
+                method: msg.method,
                 params: [
                   {
                     result: {
-                      name:user._doc.name,
-                      id: user.id,
-                      username: user.name,
-                      email: user.email1
-
+                      name: payload._doc.name,
+                      id: payload._doc.id,
+                      username: payload._doc.name,
+                      email: payload._doc.email
                     }
                   }
                 ]
@@ -101,18 +98,48 @@ router.ws('/ws', (ws, req)=> {
             ));
           }
         });
-        // User.getUserByUsername(newMsg.params[0].username, (err, user) => {
-        //   if(err) throw err;
-        //   ws.send(JSON.stringify({user: {
-        //     name:user.name,
-        //     id: user.id,
-        //     username: user.name,
-        //     email: user.email
-        //   }}));
-        // })
+        break;
+      case "getNotes":
+        jwt.verify(msg.params[0].token, config.secret, (err, payload) => {
+          if(err) {
+            ws.send(JSON.stringify({
+              method: msg.method,
+              params: [
+                {
+                  error: {
+                    name: err.name,
+                    message: err.message
+                  }
+                }
+              ]
+            }));
+          } else {
+            ws.send(JSON.stringify({
+              method: msg.method,
+              params: [
+                {
+                  result: {
+                    notes: payload._doc.notes
+                  }
+                }
+              ]
+            }));
+          }
+        });
         break;
       default:
-
+        ws.send(JSON.stringify(
+          {
+            method: msg.method,
+            params: [
+              {
+                result: {
+                  error: "Invalid Method!"
+                }
+              }
+            ]
+          }
+        ))
     }
   })
 });
