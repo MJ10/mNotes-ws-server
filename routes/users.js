@@ -35,7 +35,7 @@ router.post('/authenticate', (req, res, next) => {
         if (err) throw err;
         if(isMatch) {
           const token = jwt.sign(user, config.secret, {
-            expiresIn: 604800
+            expiresIn: 1209600
           });
           res.json({
             success: true,
@@ -139,7 +139,7 @@ router.ws('/ws', (ws, req)=> {
               }
             ]
           }
-        ))
+        ));
     }
   })
 });
