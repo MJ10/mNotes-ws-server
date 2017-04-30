@@ -89,7 +89,7 @@ router.ws('/ws', (ws, req)=> {
                     result: {
                       name: payload._doc.name,
                       id: payload._doc.id,
-                      username: payload._doc.name,
+                      username: payload._doc.username,
                       email: payload._doc.email
                     }
                   }
@@ -124,6 +124,67 @@ router.ws('/ws', (ws, req)=> {
                 }
               ]
             }));
+          }
+        });
+        break;
+      case "addNote":
+        jwt.verify(msg.params[0].token, config.secret, (err, payload) => {
+          if(err) {
+            ws.send(JSON.stringify({
+              method: msg.method,
+              params: [
+                {
+                  error: {
+                    name: err.name,
+                    message: err.message
+                  }
+                }
+              ]
+            }));
+          } else {
+            User.getUserById(payload._doc._id, (err, user) => {
+              if(err){
+                ws.send(JSON.stringify({
+                  method: msg.method,
+                  params: [
+                    {
+                      error: {
+                        name: err.name,
+                        message: err.message
+                      }
+                    }
+                  ]
+                }));
+              } else {
+                updNotes = user.notes;
+                updNotes.push(msg.params[1].note);
+                user.notes = updNotes;
+                user.save((err, savedUser, numCallback) => {
+                  if(err){
+                    ws.send(JSON.stringify({
+                      method: msg.method,
+                      params: [
+                        {
+                          error: {
+                            name: err.name,
+                            message: err.message
+                          }
+                        }
+                      ]
+                    }));
+                  } else {
+                    ws.send(JSON.stringify({
+                        method: "addNote",
+                        params: [{
+                          result: {
+                            user: savedUser
+                          }
+                        }]
+                    }));
+                  }
+                })
+              }
+            });
           }
         });
         break;
