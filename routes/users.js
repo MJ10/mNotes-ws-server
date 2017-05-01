@@ -182,7 +182,71 @@ router.ws('/ws', (ws, req)=> {
                         }]
                     }));
                   }
-                })
+                });
+              }
+            });
+          }
+        });
+        break;
+      case "deleteNote":
+        jwt.verify(msg.params[0].token, config.secret, (err, payload) => {
+          if(err) {
+            ws.send(JSON.stringify({
+              method: msg.method,
+              params: [
+                {
+                  error: {
+                    name: err.name,
+                    message: err.message
+                  }
+                }
+              ]
+            }));
+          } else {
+            User.getUserById(payload._doc._id, (err, user) => {
+              if(err) {
+                ws.send(JSON.stringify({
+                  method: msg.method,
+                  params: [
+                    {
+                      error: {
+                        name: err.name,
+                        message: err.message
+                      }
+                    }
+                  ]
+                }));
+              } else {
+                for(i = 0; i < user.notes.length, ++i) {
+                  if(user.notes[i].id == msg.params[1].noteID) {
+                    user.notes.splice(i,1);
+                    break;
+                  }
+                }
+                user.save((err, savedUser, numCallback) => {
+                  if(err){
+                    ws.send(JSON.stringify({
+                      method: msg.method,
+                      params: [
+                        {
+                          error: {
+                            name: err.name,
+                            message: err.message
+                          }
+                        }
+                      ]
+                    }));
+                  } else {
+                    ws.send(JSON.stringify({
+                        method: "addNote",
+                        params: [{
+                          result: {
+                            user: savedUser
+                          }
+                        }]
+                    }));
+                  }
+                });
               }
             });
           }
