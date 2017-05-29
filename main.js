@@ -8,7 +8,7 @@ const mongoose = require('mongoose');
 const app = express();
 const expressWs = require('express-ws')(app);
 
-const users = require('./routes/users');
+const auth = require('./routes/auth');
 const config = require('./config/db');
 
 mongoose.connect(config.database);
@@ -34,7 +34,7 @@ app.use(passport.session());
 
 require('./config/passport')(passport);
 
-app.use('/users', users);
+app.use('/auth', auth);
 app.get('/', (req, resp) => {
   resp.send("Invalid Route");
 });

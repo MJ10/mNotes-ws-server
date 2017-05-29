@@ -1,15 +1,15 @@
 {
-  "name": "m-notes",
-  "version": "0.0.1",
-  "description": "Realtime API for mNOTES",
+  "name": "auth-template",
+  "version": "1.0.0",
+  "description": "Authentication API template",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node main"
   },
   "keywords": [
-    "notes",
-    "mNotes"
+    "auth",
+    "template"
   ],
   "author": "Moksh Jain",
   "license": "MIT",
